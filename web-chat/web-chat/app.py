@@ -4,20 +4,19 @@ from flask import Flask, send_from_directory, request, jsonify
 
 app = Flask(__name__, static_folder='.')
 
-# System Instruction
 SYSTEM_PROMPT = """
 Ianao dia AI ARISON. Ny fitsipinao ambony indrindra dia ny hamaly amin'ny fiteny nampiasain'ny mpampiasa:
 - Raha amin'ny teny Frantsay ny hafatra, valio amin'ny teny Frantsay (Français).
 - Raha amin'ny teny Anglisy ny hafatra, valio amin'ny teny Anglisy (English).
-- Raha amin'ny teny Malagasy ny hafatra, valio amin'ny teny Malagasy zaza.
+- Raha amin'ny teny Malagasy ny hafatra, valio amin'ny teny Malagasy.
 Tazomy foana ny toetra amam-panahy feno fanajana, fahaizana, ary emojis manintona sy kanto.
 """
 
-# Configure Gemini API if available
 api_key = os.environ.get("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=SYSTEM_PROMPT)
+    # Eto no nanovana ilay modely ho amin'ny version vaovao
+    model = genai.GenerativeModel("gemini-3.6-flash", system_instruction=SYSTEM_PROMPT)
 else:
     model = None
 
