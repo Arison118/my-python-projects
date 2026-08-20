@@ -31,21 +31,40 @@ function appendUserMessage(text) {
     container.scrollTop = container.scrollHeight;
 }
 
+// Fomba fampielezana valin-teny misy espace sy loko kanto
 function appendBotSubtitleMessage(text) {
     const container = document.getElementById('chat-container');
     const msgDiv = document.createElement('div');
-    msgDiv.className = 'message bot-message';
+    msgDiv.className = 'message bot-message bot-styled-text';
     container.appendChild(msgDiv);
 
+    // Fanamboarana ny Markdown ** ho <b> sy fanadiovana ny espace
+    let formattedText = text
+        .replace(/\*\*(.*?)\*\*/g, '<b style="color: #00d2ff;">$1</b>')
+        .replace(/\n/g, '<br>');
+
     let index = 0;
+    let isTag = false;
+    let currentHtml = '';
+
     const interval = setInterval(() => {
-        msgDiv.innerText += text.charAt(index);
-        index++;
-        container.scrollTop = container.scrollHeight;
-        if (index >= text.length) {
+        if (index < formattedText.length) {
+            let char = formattedText.charAt(index);
+
+            if (char === '<') isTag = true;
+            currentHtml += char;
+            if (char === '>') isTag = false;
+
+            if (!isTag) {
+                msgDiv.innerHTML = currentHtml;
+                container.scrollTop = container.scrollHeight;
+            }
+            index++;
+        } else {
+            msgDiv.innerHTML = formattedText;
             clearInterval(interval);
         }
-    }, 25);
+    }, 15);
 }
 
 async function sendMessage() {
@@ -70,7 +89,6 @@ async function sendMessage() {
     }
 }
 
-// Voice Recognition
 function startVoiceRecognition() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
         alert("Tsy mahazaka Voice Recognition ny browser-nao tompoko.");
@@ -92,13 +110,8 @@ function startVoiceRecognition() {
         sendMessage();
     };
 
-    recognition.onerror = () => {
-        micIcon.style.color = '#58a6ff';
-    };
-
-    recognition.onend = () => {
-        micIcon.style.color = '#58a6ff';
-    };
+    recognition.onerror = () => { micIcon.style.color = '#58a6ff'; };
+    recognition.onend = () => { micIcon.style.color = '#58a6ff'; };
 
     recognition.start();
 }
