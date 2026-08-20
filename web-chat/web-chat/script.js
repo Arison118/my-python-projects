@@ -31,40 +31,43 @@ function appendUserMessage(text) {
     container.scrollTop = container.scrollHeight;
 }
 
-// Fomba fampielezana valin-teny misy espace sy loko kanto
+// Function mametraka ny parsing sy loko tsara tarehy
+function parseMarkdownToHTML(text) {
+    let formatted = text;
+
+    # Headings (### na ##) -> Cyan Neon color
+    formatted = formatted.replace(/^### (.*$)/gim, '<h3 style="color: #00f0ff; font-weight: bold; margin-top: 10px; margin-bottom: 5px;">$1</h3>');
+    formatted = formatted.replace(/^## (.*$)/gim, '<h2 style="color: #00f0ff; font-weight: bold; margin-top: 12px; margin-bottom: 5px;">$1</h2>');
+
+    # Bold (**text**) -> Rose / Fuchsia Neon color
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ff2a8d; font-weight: bold;">$1</strong>');
+
+    # Horizontal Rules (---)
+    formatted = formatted.replace(/^---$/gim, '<hr style="border: 0; height: 1px; background: #333; margin: 10px 0;">');
+
+    # Bullet points (* na -)
+    formatted = formatted.replace(/^\* (.*$)/gim, '<li style="margin-left: 15px;">$1</li>');
+    formatted = formatted.replace(/^- (.*$)/gim, '<li style="margin-left: 15px;">$1</li>');
+
+    # Line breaks
+    formatted = formatted.replace(/\n/g, '<br>');
+
+    return formatted;
+}
+
 function appendBotSubtitleMessage(text) {
     const container = document.getElementById('chat-container');
     const msgDiv = document.createElement('div');
-    msgDiv.className = 'message bot-message bot-styled-text';
+    msgDiv.className = 'message bot-message';
+    msgDiv.style.color = '#e0e0e0';
+    msgDiv.style.lineHeight = '1.6';
+    msgDiv.style.fontSize = '15px';
+    
     container.appendChild(msgDiv);
 
-    // Fanamboarana ny Markdown ** ho <b> sy fanadiovana ny espace
-    let formattedText = text
-        .replace(/\*\*(.*?)\*\*/g, '<b style="color: #00d2ff;">$1</b>')
-        .replace(/\n/g, '<br>');
-
-    let index = 0;
-    let isTag = false;
-    let currentHtml = '';
-
-    const interval = setInterval(() => {
-        if (index < formattedText.length) {
-            let char = formattedText.charAt(index);
-
-            if (char === '<') isTag = true;
-            currentHtml += char;
-            if (char === '>') isTag = false;
-
-            if (!isTag) {
-                msgDiv.innerHTML = currentHtml;
-                container.scrollTop = container.scrollHeight;
-            }
-            index++;
-        } else {
-            msgDiv.innerHTML = formattedText;
-            clearInterval(interval);
-        }
-    }, 15);
+    let htmlFormatted = parseMarkdownToHTML(text);
+    msgDiv.innerHTML = htmlFormatted;
+    container.scrollTop = container.scrollHeight;
 }
 
 async function sendMessage() {

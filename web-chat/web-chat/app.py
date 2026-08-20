@@ -4,19 +4,32 @@ from flask import Flask, send_from_directory, request, jsonify
 
 app = Flask(__name__, static_folder='.')
 
+# System Instruction ho an'i AI ARISON
 SYSTEM_PROMPT = """
-Ianao dia AI ARISON. Ny fitsipinao ambony indrindra dia ny hamaly amin'ny fiteny nampiasain'ny mpampiasa:
-- Raha amin'ny teny Frantsay ny hafatra, valio amin'ny teny Frantsay (Français).
-- Raha amin'ny teny Anglisy ny hafatra, valio amin'ny teny Anglisy (English).
-- Raha amin'ny teny Malagasy ny hafatra, valio amin'ny teny Malagasy.
-Tazomy foana ny toetra amam-panahy feno fanajana, fahaizana, ary emojis manintona sy kanto.
+Ianao dia AI ARISON, mpanampy ara-tsaina manam-pahaizana, feno fahasalamana, ary feno haja.
+
+NOHO IZANY:
+1. VALIO AMIN'NY FITENY AMPIASAIN'NY MPAMPIASA HATRANY NY HAFATRA:
+   - Raha amin'ny teny Malagasy ny fanontaniana: valio amin'ny teny Malagasy feno haja sy mazava.
+   - Raha amin'ny teny Frantsay: valio amin'ny teny Frantsay (Français).
+   - Raha amin'ny teny Anglisy: valio amin'ny teny Anglisy (English).
+   - Sanatria misy fiteny hafa ampiasainy: valio amin'io fiteny ampiasainy io hatrany.
+
+2. FOMBA FANORATRA (FORMATTING):
+   - Mampiasà Markdown mba hahafahan'ny interface mandravaka azy amin'ny loko:
+     * Ampiasao ny '**' manodidina ny teny manan-danja na lehibe (Ohatra: **AI ARISON** na **Eny tompoko**).
+     * Ampiasao ny '###' na '##' amin'ny lohateny sy ny zana-doha (Ohatra: ### 1. Ny fetra ara-teknolojia).
+     * Mampiasà emojis mifanaraka tsara amin'ny fiteny mba hahatonga ny valiny ho kanto sy hahaliana.
 """
 
-api_key = os.environ.get("GEMINI_API_KEY")
+# Rest of the app configuration
+api_key = os.environ.get('GEMINI_API_KEY')
 if api_key:
     genai.configure(api_key=api_key)
-    # Eto no nanovana ilay modely ho amin'ny version vaovao
-    model = genai.GenerativeModel("gemini-3.6-flash", system_instruction=SYSTEM_PROMPT)
+    model = genai.GenerativeModel(
+        model_name='gemini-3.6-flash',
+        system_instruction=SYSTEM_PROMPT
+    )
 else:
     model = None
 
@@ -24,13 +37,15 @@ else:
 def index():
     return send_from_directory('.', 'index.html')
 
-@app.route('/<path:filename>')
-def serve_static(filename):
-    return send_from_directory('.', filename)
+@app.route('/<path:path>')
+def send_static(path):
+    return send_from_directory('.', path)
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_msg = request.json.get('message', '')
+    data = request.get_json()
+    user_msg = data.get('message', '')
+
     if not user_msg:
         return jsonify({'reply': 'Azafady, soraty ny hafatrao tompoko!'})
 
@@ -39,9 +54,9 @@ def chat():
             res = model.generate_content(user_msg)
             return jsonify({'reply': res.text})
         except Exception as e:
-            return jsonify({'reply': f'Mbo misy olana kely amin\'ny valin-teny: {str(e)}'})
+            return jsonify({'reply': f"Mbo misy olana kely amin'ny valin-teny: {str(e)}"})
     else:
-        return jsonify({'reply': f'Salama tompoko! Azoko ny hafatrao: "{user_msg}". AI ARISON dia vonona hatrany! ✨'})
+        return jsonify({'reply': f"Salama tompoko! Azoko ny hafatrao: \"{user_msg}\". AI ARISON dia vonona hatrany! ✨"})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
