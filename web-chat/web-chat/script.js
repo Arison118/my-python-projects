@@ -1,4 +1,5 @@
 let conversationHistory = [];
+let selectedFile = null;
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -6,15 +7,30 @@ function toggleSidebar() {
 }
 
 function triggerFileInput() {
-    document.getElementById('file-input').click();
+    const input = document.getElementById('file-input');
+    if (input) input.click();
 }
 
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (file) {
-        appendUserMessage(`📁 Fichier voafidy: ${file.name}`);
-        saveToHistory(`📁 Fichier: ${file.name}`);
+        selectedFile = file;
+        const previewArea = document.getElementById('file-preview-area');
+        if (previewArea) {
+            previewArea.innerHTML = `<div style="background: rgba(0, 240, 255, 0.1); border: 1px solid #00f0ff; color: #00f0ff; padding: 5px 12px; border-radius: 15px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                📄 ${file.name} 
+                <span onclick="removeSelectedFile()" style="cursor: pointer; color: #ff2a8d; font-weight: bold; margin-left: 5px;">✕</span>
+            </div>`;
+        }
     }
+}
+
+function removeSelectedFile() {
+    selectedFile = null;
+    const input = document.getElementById('file-input');
+    if (input) input.value = '';
+    const previewArea = document.getElementById('file-preview-area');
+    if (previewArea) previewArea.innerHTML = '';
 }
 
 function handleKeyPress(event) {
@@ -23,16 +39,31 @@ function handleKeyPress(event) {
     }
 }
 
-function appendUserMessage(text) {
+function hideWelcomeCard() {
+    const welcomeCard = document.querySelector('.welcome-card');
+    if (welcomeCard) {
+        welcomeCard.style.display = 'none';
+    }
+}
+
+function appendUserMessage(text, fileName = null) {
+    hideWelcomeCard();
     const container = document.getElementById('chat-container');
     if (!container) return;
     const msgDiv = document.createElement('div');
     msgDiv.className = 'message user-message';
-    msgDiv.innerText = text;
+    
+    let content = text;
+    if (fileName) {
+        content = `📁 <em>[Fichier: ${fileName}]</em><br>` + content;
+    }
+    
+    msgDiv.innerHTML = content;
     container.appendChild(msgDiv);
     container.scrollTop = container.scrollHeight;
 }
 
+// VOATAZONA 100%: Parsing Markdown Neon Rose & Cyan
 function parseMarkdownToHTML(text) {
     let formatted = text;
 
@@ -47,6 +78,7 @@ function parseMarkdownToHTML(text) {
     return formatted;
 }
 
+// VOATAZONA 100%: Indicator 🤔 Mieritreritra
 function showThinkingIndicator() {
     const container = document.getElementById('chat-container');
     if (!container) return null;
@@ -54,9 +86,6 @@ function showThinkingIndicator() {
     const thinkingDiv = document.createElement('div');
     thinkingDiv.id = 'thinking-indicator';
     thinkingDiv.className = 'message bot-message';
-    thinkingDiv.style.background = 'transparent';
-    thinkingDiv.style.border = 'none';
-    thinkingDiv.style.boxShadow = 'none';
     thinkingDiv.style.color = '#00f0ff';
     thinkingDiv.style.fontSize = '15px';
     thinkingDiv.style.fontStyle = 'italic';
@@ -74,20 +103,13 @@ function removeThinkingIndicator() {
     }
 }
 
+// VOATAZONA 100%: Valinteny sans cadre gris
 function appendBotSubtitleMessage(text) {
     const container = document.getElementById('chat-container');
     if (!container) return;
 
     const msgDiv = document.createElement('div');
     msgDiv.className = 'message bot-message';
-    
-    msgDiv.style.background = 'transparent';
-    msgDiv.style.border = 'none';
-    msgDiv.style.boxShadow = 'none';
-    msgDiv.style.padding = '5px 0';
-    msgDiv.style.color = '#ffffff';
-    msgDiv.style.lineHeight = '1.6';
-    msgDiv.style.fontSize = '15px';
     
     container.appendChild(msgDiv);
 
@@ -100,19 +122,30 @@ async function sendMessage() {
     const input = document.getElementById('user-input');
     if (!input) return;
     const text = input.value.trim();
-    if (!text) return;
+    
+    if (!text && !selectedFile) return;
 
-    appendUserMessage(text);
-    saveToHistory(text);
+    const fileToSend = selectedFile;
+    const fileName = fileToSend ? fileToSend.name : null;
+
+    appendUserMessage(text, fileName);
+    saveToHistory(text || fileName);
+    
     input.value = '';
+    removeSelectedFile();
 
     showThinkingIndicator();
+
+    const formData = new FormData();
+    formData.append('message', text);
+    if (fileToSend) {
+        formData.append('file', fileToSend);
+    }
 
     try {
         const response = await fetch('/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
+            body: formData
         });
         const data = await response.json();
         
@@ -141,12 +174,12 @@ function startVoiceRecognition() {
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         document.getElementById('user-input').value = transcript;
-        if (micIcon) micIcon.style.color = '#58a6ff';
+        if (micIcon) micIcon.style.color = '#8b949e';
         sendMessage();
     };
 
-    recognition.onerror = () => { if (micIcon) micIcon.style.color = '#58a6ff'; };
-    recognition.onend = () => { if (micIcon) micIcon.style.color = '#58a6ff'; };
+    recognition.onerror = () => { if (micIcon) micIcon.style.color = '#8b949e'; };
+    recognition.onend = () => { if (micIcon) micIcon.style.color = '#8b949e'; };
 
     recognition.start();
 }

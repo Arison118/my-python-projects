@@ -1,6 +1,9 @@
 import os
+import io
 import google.generativeai as genai
 from flask import Flask, send_from_directory, request, jsonify
+from pypdf import PdfReader
+import docx
 
 app = Flask(__name__, static_folder='.')
 
@@ -25,6 +28,24 @@ if api_key:
 else:
     model = None
 
+def extract_text_from_file(file_bytes, filename):
+    ext = filename.split('.')[-1].lower()
+    text = ""
+    try:
+        if ext == 'txt':
+            text = file_bytes.decode('utf-8', errors='ignore')
+        elif ext == 'pdf':
+            pdf = PdfReader(io.BytesIO(file_bytes))
+            for page in pdf.pages:
+                t = page.extract_text()
+                if t: text += t + "\n"
+        elif ext == 'docx':
+            doc = docx.Document(io.BytesIO(file_bytes))
+            text = "\n".join([p.text for p in doc.paragraphs])
+    except Exception as e:
+        text = f"[Olana amin'ny famakiana ny fichier: {str(e)}]"
+    return text
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -36,17 +57,25 @@ def send_static(path):
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
-        data = request.get_json(silent=True) or {}
-        user_msg = data.get('message', '')
+        user_msg = request.form.get('message', '')
+        file_obj = request.files.get('file')
 
-        if not user_msg:
-            return jsonify({'reply': 'Azafady, soraty ny hafatrao tompoko!'})
+        full_prompt = user_msg
+
+        if file_obj:
+            filename = file_obj.filename
+            file_bytes = file_obj.read()
+            extracted_text = extract_text_from_file(file_bytes, filename)
+            full_prompt += f"\n\n--- AMBATON'NY RAKITRA / FICHIER ({filename}) ---\n{extracted_text}\n--- FARANY ---"
+
+        if not full_prompt.strip():
+            return jsonify({'reply': 'Azafady, soraty ny hafatrao na andefaso fichier tompoko!'})
 
         if model:
-            res = model.generate_content(user_msg)
+            res = model.generate_content(full_prompt)
             return jsonify({'reply': res.text})
         else:
-            return jsonify({'reply': f'Salama tompoko! Azoko ny hafatrao: "{user_msg}". AI ARISON dia vonona hatrany! ✨'})
+            return jsonify({'reply': f'Salama tompoko! Azoko ny hafatrao sy ny fichier. AI ARISON dia vonona hatrany! ✨'})
     except Exception as e:
         return jsonify({'reply': f'Misy olana kely amin\'ny valin-teny: {str(e)}'})
 

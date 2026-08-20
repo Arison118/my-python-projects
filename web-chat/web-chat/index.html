@@ -3,273 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI ARISON</title>
+    <title>AI ARISON - Officiel</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --text-color: #c9d1d9;
-            --accent-pink: #ff007f;
-            --accent-violet: #8a2be2;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        /* Header & Sidebar Menu */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 20px;
-            background-color: var(--card-bg);
-            border-bottom: 1px solid #30363d;
-        }
-
-        .menu-btn {
-            background: none;
-            border: none;
-            color: #58a6ff;
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        .title-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #58a6ff;
-        }
-
-        /* Sidebar History */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 250px;
-            height: 100%;
-            background-color: var(--card-bg);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-            transition: 0.3s ease;
-            z-index: 1000;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar.active {
-            left: 0;
-        }
-
-        .sidebar h3 {
-            color: #58a6ff;
-            border-bottom: 1px solid #30363d;
-            padding-bottom: 10px;
-        }
-
-        .history-list {
-            flex: 1;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
-        .history-item {
-            padding: 10px;
-            margin-bottom: 8px;
-            background: #21262d;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Neon Rose Title Animation */
-        .neon-welcome {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #fff;
-            margin: 15px 10px 5px 10px;
-            text-transform: uppercase;
-            animation: neonGlow 1.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes neonGlow {
-            from {
-                text-shadow: 0 0 5px #ff007f, 0 0 10px #ff007f, 0 0 20px #ff007f;
-            }
-            to {
-                text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f, 0 0 30px #ff007f, 0 0 40px #ff007f;
-            }
-        }
-
-        /* Profile & Subtitle */
-        .profile-container {
-            text-align: center;
-            padding: 10px;
-        }
-
-        .avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            border: 3px solid #00d2ff;
-            box-shadow: 0 0 15px #00d2ff;
-            object-fit: cover;
-        }
-
-        .bot-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #00d2ff;
-            margin-top: 8px;
-        }
-
-        .violet-text {
-            color: #a855f7;
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 5px;
-        }
-
-        /* Chat Area */
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background-color: #1f6beb;
-            color: white;
-        }
-
-        .bot-message {
-            color: #00f0ff;
-            font-size: 15px;
-            letter-spacing: 0.3px;
-            line-height: 1.6;
-            align-self: flex-start;
-            background-color: #21262d;
-            border: 1px solid #30363d;
-            color: var(--text-color);
-        }
-
-        /* Input Controls Bar */
-        .input-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px;
-            background-color: var(--card-bg);
-            border-top: 1px solid #30363d;
-        }
-
-        .input-btn {
-            background: #21262d;
-            border: none;
-            color: #58a6ff;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .input-btn:hover {
-            background: #30363d;
-        }
-
-        .chat-input {
-            flex: 1;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 20px;
-            padding: 10px 15px;
-            color: white;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .send-btn {
-            background: #00d2ff;
-            color: #000;
-        }
-
-        #file-input {
-            display: none;
-        }
-    </style>
 </head>
 <body>
 
-    <!-- Sidebar History -->
-    <div class="sidebar" id="sidebar">
-        <h3><i class="fa-solid fa-history"></i> Historique</h3>
-        <div class="history-list" id="history-list"></div>
-    </div>
-
-    <!-- Header -->
-    <header>
-        <button class="menu-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-        <div class="title-area">
-            <i class="fa-solid fa-robot"></i> ARISON ✨
+    <!-- SIDEBAR (Style ChatGPT / Gemini) -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="location.reload()">
+                <i class="fa-solid fa-plus"></i> New Chat
+            </button>
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
-        <div></div>
-    </header>
-
-    <!-- Neon Animated Title -->
-    <div class="neon-welcome">
-        TONGASOA IANAO TOMPOKO ETO AMIN'NY PEJY
+        <div class="history-title">Tantaran'ny Resaka</div>
+        <div id="history-list" class="history-list"></div>
     </div>
 
-    <!-- Profile Area -->
-    <div class="profile-container">
-        <img src="arison.jpg" alt="AI ARISON" class="avatar">
-        <div class="bot-name">AI ARISON</div>
-        <div class="violet-text">"Mazoto ary tompoko dia mirary soa sy fahombiazana hatrany e🤗!"</div>
-    </div>
-
-    <!-- Chat Messages -->
-    <div class="chat-container" id="chat-container"></div>
-
-    <!-- Input Bar -->
-    <div class="input-bar">
-        <button class="input-btn" onclick="triggerFileInput()"><i class="fa-solid fa-plus"></i></button>
-        <input type="file" id="file-input" onchange="handleFileUpload(event)">
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
         
-        <input type="text" id="user-input" class="chat-input" placeholder="Soraty eto ny hafatra..." onkeypress="handleKeyPress(event)">
-        
-        <button class="input-btn" onclick="startVoiceRecognition()"><i class="fa-solid fa-microphone" id="mic-icon"></i></button>
-        <button class="input-btn send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        <!-- HEADER OFISIELY -->
+        <header class="app-header">
+            <button class="menu-btn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="header-title">AI ARISON</div>
+            <!-- PROFILS AVATAR (HITA FOANA EO AMBONY ANKAVANANA) -->
+            <div class="user-profile-header">
+                <img src="arison.jpg" alt="Arison Avatar" class="profile-avatar-img" onerror="this.src='https://via.placeholder.com/40'">
+            </div>
+        </header>
+
+        <!-- CHAT AREA -->
+        <main id="chat-container" class="chat-container">
+            <!-- WELCOME SCREEN -->
+            <div class="welcome-card">
+                <img src="arison.jpg" alt="AI Arison" class="welcome-avatar" onerror="this.src='https://via.placeholder.com/90'">
+                <h2>Salama Arison, inona no azoko ampiana anao androany? ✨</h2>
+                <p>"Mazoto ary tompoko dia mirary soa sy fahombiazana hatrany e 🤗!"</p>
+            </div>
+        </main>
+
+        <!-- INPUT BAR SECTION -->
+        <footer class="input-section">
+            <div id="file-preview-area"></div>
+            
+            <div class="input-container">
+                <!-- BOUTON PIECE JOINTE (+) -->
+                <button class="icon-btn" onclick="triggerFileInput()" title="Mandefa Fichier">
+                    <i class="fa-solid fa-paperclip"></i>
+                </button>
+                <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)" accept=".pdf,.docx,.txt,image/*">
+
+                <!-- INPUT TEXT -->
+                <input type="text" id="user-input" placeholder="Soraty eto ny hafatra..." onkeypress="handleKeyPress(event)">
+
+                <!-- MICROPHONE -->
+                <button class="icon-btn" onclick="startVoiceRecognition()" title="Hirafehy feo">
+                    <i class="fa-solid fa-microphone" id="mic-icon"></i>
+                </button>
+
+                <!-- SEND BUTTON -->
+                <button class="send-btn" onclick="sendMessage()" title="Alefa">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </footer>
+
     </div>
 
     <script src="script.js"></script>
