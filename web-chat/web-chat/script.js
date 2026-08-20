@@ -63,7 +63,7 @@ function appendUserMessage(text, fileName = null) {
     container.scrollTop = container.scrollHeight;
 }
 
-// VOATAZONA 100%: Parsing Markdown Neon Rose & Cyan
+// Parsing Markdown Neon Rose & Cyan
 function parseMarkdownToHTML(text) {
     let formatted = text;
 
@@ -78,7 +78,7 @@ function parseMarkdownToHTML(text) {
     return formatted;
 }
 
-// VOATAZONA 100%: Indicator 🤔 Mieritreritra
+// Indicator 🤔 Mieritreritra
 function showThinkingIndicator() {
     const container = document.getElementById('chat-container');
     if (!container) return null;
@@ -103,19 +103,29 @@ function removeThinkingIndicator() {
     }
 }
 
-// VOATAZONA 100%: Valinteny sans cadre gris
-function appendBotSubtitleMessage(text) {
+// VALINTENY MISESISESY (TYPEWRITER EFFECT)
+function appendBotSubtitleMessage(fullText) {
     const container = document.getElementById('chat-container');
     if (!container) return;
 
     const msgDiv = document.createElement('div');
     msgDiv.className = 'message bot-message';
-    
     container.appendChild(msgDiv);
 
-    let htmlFormatted = parseMarkdownToHTML(text);
-    msgDiv.innerHTML = htmlFormatted;
-    container.scrollTop = container.scrollHeight;
+    let currentIndex = 0;
+    const speed = 15; // Vitesse amin'ny ms (misesisesy tsara sy haingana)
+
+    function typeNextChar() {
+        if (currentIndex <= fullText.length) {
+            let currentSubString = fullText.substring(0, currentIndex);
+            msgDiv.innerHTML = parseMarkdownToHTML(currentSubString);
+            container.scrollTop = container.scrollHeight;
+            currentIndex++;
+            setTimeout(typeNextChar, speed);
+        }
+    }
+
+    typeNextChar();
 }
 
 async function sendMessage() {
