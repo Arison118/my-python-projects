@@ -4,25 +4,17 @@ from flask import Flask, send_from_directory, request, jsonify
 
 app = Flask(__name__, static_folder='.')
 
-# System Instruction ho an'i AI ARISON
 SYSTEM_PROMPT = """
-Ianao dia AI ARISON, mpanampy ara-tsaina manam-pahaizana, feno fahasalamana, ary feno haja.
+Ianao dia AI ARISON, mpanampy ara-tsaina manam-pahaizana sy feno haja.
 
-NOHO IZANY:
-1. VALIO AMIN'NY FITENY AMPIASAIN'NY MPAMPIASA HATRANY NY HAFATRA:
-   - Raha amin'ny teny Malagasy ny fanontaniana: valio amin'ny teny Malagasy feno haja sy mazava.
-   - Raha amin'ny teny Frantsay: valio amin'ny teny Frantsay (Français).
-   - Raha amin'ny teny Anglisy: valio amin'ny teny Anglisy (English).
-   - Sanatria misy fiteny hafa ampiasainy: valio amin'io fiteny ampiasainy io hatrany.
-
-2. FOMBA FANORATRA (FORMATTING):
-   - Mampiasà Markdown mba hahafahan'ny interface mandravaka azy amin'ny loko:
-     * Ampiasao ny '**' manodidina ny teny manan-danja na lehibe (Ohatra: **AI ARISON** na **Eny tompoko**).
-     * Ampiasao ny '###' na '##' amin'ny lohateny sy ny zana-doha (Ohatra: ### 1. Ny fetra ara-teknolojia).
-     * Mampiasà emojis mifanaraka tsara amin'ny fiteny mba hahatonga ny valiny ho kanto sy hahaliana.
+FITSIPIKA:
+1. Valio amin'ny fiteny ampiasain'ny mpampiasa hatrany ny hafatra (Malagasy, Français, English, etc.).
+2. Mampiasà Markdown kanto:
+   - Ampiasao ny '**' ho an'ny teny manan-danja (mivoaka amin'ny loko Rose Neon).
+   - Ampiasao ny '###' ho an'ny lohateny (mivoaka amin'ny loko Cyan Neon).
+   - Mampiasà emojis mifanaraka tsara.
 """
 
-# Rest of the app configuration
 api_key = os.environ.get('GEMINI_API_KEY')
 if api_key:
     genai.configure(api_key=api_key)
@@ -43,20 +35,20 @@ def send_static(path):
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    data = request.get_json()
-    user_msg = data.get('message', '')
+    try:
+        data = request.get_json(silent=True) or {}
+        user_msg = data.get('message', '')
 
-    if not user_msg:
-        return jsonify({'reply': 'Azafady, soraty ny hafatrao tompoko!'})
+        if not user_msg:
+            return jsonify({'reply': 'Azafady, soraty ny hafatrao tompoko!'})
 
-    if model:
-        try:
+        if model:
             res = model.generate_content(user_msg)
             return jsonify({'reply': res.text})
-        except Exception as e:
-            return jsonify({'reply': f"Mbo misy olana kely amin'ny valin-teny: {str(e)}"})
-    else:
-        return jsonify({'reply': f"Salama tompoko! Azoko ny hafatrao: \"{user_msg}\". AI ARISON dia vonona hatrany! ✨"})
+        else:
+            return jsonify({'reply': f'Salama tompoko! Azoko ny hafatrao: "{user_msg}". AI ARISON dia vonona hatrany! ✨'})
+    except Exception as e:
+        return jsonify({'reply': f'Misy olana kely amin\'ny valin-teny: {str(e)}'})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
