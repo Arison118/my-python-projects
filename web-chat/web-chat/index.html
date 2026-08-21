@@ -3,77 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI ARISON - Officiel</title>
+    <title>AI ARISON</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <button id="sidebar-toggle" class="icon-btn"><i class="fa-solid fa-bars"></i></button>
 
-    <!-- SIDEBAR (Style ChatGPT / Gemini) -->
-    <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <button class="new-chat-btn" onclick="location.reload()">
-                <i class="fa-solid fa-plus"></i> New Chat
-            </button>
-            <button class="close-sidebar-btn" onclick="toggleSidebar()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="history-title">Tantaran'ny Resaka</div>
-        <div id="history-list" class="history-list"></div>
-    </div>
+            <!-- MODEL SELECTOR DROPDOWN (OFFICIAL GEMINI STYLE) -->
+            <div class="model-dropdown-container">
+                <button id="model-dropdown-btn" class="model-btn">
+                    <span id="current-model-label">3.5 Flash-Lite</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                
+                <div id="model-menu" class="model-menu hidden">
+                    <div class="model-option active" data-model="lite">
+                        <div class="model-title">3.5 Flash-Lite</div>
+                        <div class="model-desc">Réponses les plus rapides</div>
+                    </div>
+                    <div class="model-option" data-model="flash">
+                        <div class="model-title">3.6 Flash</div>
+                        <div class="model-desc">Aide polyvalente</div>
+                    </div>
+                    <div class="model-option" data-model="pro">
+                        <div class="model-title">3.1 Pro</div>
+                        <div class="model-desc">Raisonnement avancé</div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- MAIN CONTAINER -->
-    <div class="main-container">
-        
-        <!-- HEADER OFISIELY -->
-        <header class="app-header">
-            <button class="menu-btn" onclick="toggleSidebar()">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div class="header-title">AI ARISON</div>
-            <!-- PROFILS AVATAR (HITA FOANA EO AMBONY ANKAVANANA) -->
-            <div class="user-profile-header">
-                <img src="arison.jpg" alt="Arison Avatar" class="profile-avatar-img" onerror="this.src='https://via.placeholder.com/40'">
+            <div class="header-right">
+                <div class="user-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
             </div>
         </header>
 
-        <!-- CHAT AREA -->
-        <main id="chat-container" class="chat-container">
-            <!-- WELCOME SCREEN -->
-            <div class="welcome-card">
-                <img src="arison.jpg" alt="AI Arison" class="welcome-avatar" onerror="this.src='https://via.placeholder.com/90'">
-                <h2>Salama Arison, inona no azoko ampiana anao androany? ✨</h2>
-                <p>"Mazoto ary tompoko dia mirary soa sy fahombiazana hatrany e 🤗!"</p>
-            </div>
-        </main>
+        <!-- CHAT CONTAINER -->
+        <div id="chat-box" class="chat-box">
+            <!-- Messages load here -->
+        </div>
 
-        <!-- INPUT BAR SECTION -->
-        <footer class="input-section">
-            <div id="file-preview-area"></div>
-            
-            <div class="input-container">
-                <!-- BOUTON PIECE JOINTE (+) -->
-                <button class="icon-btn" onclick="triggerFileInput()" title="Mandefa Fichier">
+        <!-- INPUT CONTAINER -->
+        <div class="input-container">
+            <form id="chat-form" class="input-form">
+                <label for="file-input" class="icon-btn attach-btn">
                     <i class="fa-solid fa-paperclip"></i>
-                </button>
-                <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)" accept=".pdf,.docx,.txt,image/*">
-
-                <!-- INPUT TEXT -->
-                <input type="text" id="user-input" placeholder="Soraty eto ny hafatra..." onkeypress="handleKeyPress(event)">
-
-                <!-- MICROPHONE -->
-                <button class="icon-btn" onclick="startVoiceRecognition()" title="Hirafehy feo">
-                    <i class="fa-solid fa-microphone" id="mic-icon"></i>
-                </button>
-
-                <!-- SEND BUTTON -->
-                <button class="send-btn" onclick="sendMessage()" title="Alefa">
-                    <i class="fa-solid fa-paper-plane"></i>
-                </button>
-            </div>
-        </footer>
-
+                    <input type="file" id="file-input" style="display:none;">
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" id="user-input" placeholder="Soraty eto ny hafatra..." autocomplete="off">
+                    <span id="file-indicator" class="file-indicator hidden">
+                        <i class="fa-solid fa-file"></i> <span id="file-name"></span>
+                        <i id="remove-file" class="fa-solid fa-xmark remove-file-icon"></i>
+                    </span>
+                </div>
+                <button type="submit" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
     </div>
 
     <script src="script.js"></script>

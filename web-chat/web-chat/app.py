@@ -21,18 +21,16 @@ FITSIPIKA:
 api_key = os.environ.get('GEMINI_API_KEY')
 if api_key:
     genai.configure(api_key=api_key)
-    # Rehefa mi-configure dia ampiasaina ireto maodely roa ireto
-    primary_model = genai.GenerativeModel(
-        model_name='gemini-3.6-flash',
-        system_instruction=SYSTEM_PROMPT
-    )
-    backup_model = genai.GenerativeModel(
-        model_name='gemini-1.5-flash',
-        system_instruction=SYSTEM_PROMPT
-    )
-else:
-    primary_model = None
-    backup_model = None
+
+# Map model keys to stable Gemini API model identifiers
+MODEL_MAPPING = {
+    'lite': 'gemini-2.0-flash-lite',
+    'flash': 'gemini-2.5-flash',
+    'pro': 'gemini-1.5-pro'
+}
+
+# Fallback sequence order if a model hits rate-limits or errors
+FALLBACK_CASCADE = ['gemini-2.0-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash']
 
 def extract_text_from_file(file_bytes, filename):
     ext = filename.split('.')[-1].lower()
@@ -52,6 +50,33 @@ def extract_text_from_file(file_bytes, filename):
         text = f"[Olana amin'ny famakiana ny fichier: {str(e)}]"
     return text
 
+def generate_with_fallback(prompt, primary_model_name):
+    """
+    Robust Professional Cascading Fallback Engine.
+    Tries the requested model first. If 429/quota/error occurs, 
+    it dynamically cascades through backup models seamlessly.
+    """
+    # Build list: primary requested model first, then the remaining fallbacks
+    models_to_try = [primary_model_name] + [m for m in FALLBACK_CASCADE if m != primary_model_name]
+    
+    last_exception = None
+    for model_name in models_to_try:
+        try:
+            model = genai.GenerativeModel(
+                model_name=model_name,
+                system_instruction=SYSTEM_PROMPT
+            )
+            response = model.generate_content(prompt)
+            if response and response.text:
+                return response.text, model_name
+        except Exception as e:
+            last_exception = e
+            print(f"[AI ARISON Engine] Model {model_name} failed. Reason: {e}. Cascading to next backup...")
+            continue
+
+    # If all models fail unexpectedly, raise the last caught exception
+    raise last_exception if last_exception else Exception("All fallback models failed to respond.")
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -64,6 +89,7 @@ def send_static(path):
 def chat():
     try:
         user_msg = request.form.get('message', '')
+        selected_model_key = request.form.get('model', 'lite')
         file_obj = request.files.get('file')
 
         full_prompt = user_msg
@@ -77,26 +103,21 @@ def chat():
         if not full_prompt.strip():
             return jsonify({'reply': 'Azafady, soraty ny hafatrao na andefaso fichier tompoko!'})
 
-        if primary_model:
-            # 1. Andramana aloha ny gemini-3.6-flash
-            try:
-                res = primary_model.generate_content(full_prompt)
-                return jsonify({'reply': res.text})
-            except Exception as primary_err:
-                # 2. Raha misy Quota / Limit Error amin'ny 3.6, dia ampiasaina an-tsokosoko ny 1.5
-                print(f"Primary model error: {primary_err}. Switching to backup model...")
-                if backup_model:
-                    res_backup = backup_model.generate_content(full_prompt)
-                    return jsonify({'reply': res_backup.text})
-                else:
-                    raise primary_err
-        else:
-            return jsonify({'reply': f'Salama tompoko! AI ARISON dia vonona hatrany! ✨'})
+        # Resolve model name
+        target_model = MODEL_MAPPING.get(selected_model_key, 'gemini-2.0-flash-lite')
+
+        # Execute dynamic cascading generation
+        reply_text, used_model = generate_with_fallback(full_prompt, target_model)
+        
+        return jsonify({
+            'reply': reply_text,
+            'used_model': used_model
+        })
 
     except Exception as e:
         err_str = str(e)
         if "429" in err_str or "quota" in err_str.lower():
-            return jsonify({'reply': '⚠️ **Mialana tsiny tompoko**, miandrasa kely 10 segondra vao mamerina satria be loatra ny komandy miaraka miasa amin\'ny Google API!'})
+            return jsonify({'reply': '⚠️ **Mialana tsiny tompoko**, sahirana kely ny API amin\'izao segondra izao. Rehefa afaka 5 segondra dia mamerina indray tompoko!'})
         return jsonify({'reply': f'Misy olana kely: {err_str}'})
 
 if __name__ == '__main__':
