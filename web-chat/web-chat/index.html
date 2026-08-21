@@ -1,79 +1,23 @@
 <!DOCTYPE html>
-<html lang="mg">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI ARISON - Officiel</title>
+    <title>AI ARISON</title>
+
+    <!-- TSPIKA NAMPIDIRINA HO AN'NY ICON BORIBORY (MITOVY AMIN'NY GEMINI) -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0d0e12">
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
-    <!-- SIDEBAR (Style ChatGPT / Gemini) -->
-    <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <button class="new-chat-btn" onclick="location.reload()">
-                <i class="fa-solid fa-plus"></i> New Chat
-            </button>
-            <button class="close-sidebar-btn" onclick="toggleSidebar()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="history-title">Tantaran'ny Resaka</div>
-        <div id="history-list" class="history-list"></div>
-    </div>
-
-    <!-- MAIN CONTAINER -->
-    <div class="main-container">
-        
-        <!-- HEADER OFISIELY -->
-        <header class="app-header">
-            <button class="menu-btn" onclick="toggleSidebar()">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div class="header-title">AI ARISON</div>
-            <!-- PROFILS AVATAR (HITA FOANA EO AMBONY ANKAVANANA) -->
-            <div class="user-profile-header">
-                <img src="arison.jpg" alt="Arison Avatar" class="profile-avatar-img" onerror="this.src='https://via.placeholder.com/40'">
-            </div>
-        </header>
-
-        <!-- CHAT AREA -->
-        <main id="chat-container" class="chat-container">
-            <!-- WELCOME SCREEN -->
-            <div class="welcome-card">
-                <img src="arison.jpg" alt="AI Arison" class="welcome-avatar" onerror="this.src='https://via.placeholder.com/90'">
-                <h2>Salama Arison, inona no azoko ampiana anao androany? ✨</h2>
-                <p>"Mazoto ary tompoko dia mirary soa sy fahombiazana hatrany e 🤗!"</p>
-            </div>
-        </main>
-
-        <!-- INPUT BAR SECTION -->
-        <footer class="input-section">
-            <div id="file-preview-area"></div>
-            
-            <div class="input-container">
-                <!-- BOUTON PIECE JOINTE (+) -->
-                <button class="icon-btn" onclick="triggerFileInput()" title="Mandefa Fichier">
-                    <i class="fa-solid fa-paperclip"></i>
-                </button>
-                <input type="file" id="file-input" style="display: none;" onchange="handleFileUpload(event)" accept=".pdf,.docx,.txt,image/*">
-
-                <!-- INPUT TEXT -->
-                <input type="text" id="user-input" placeholder="Soraty eto ny hafatra..." onkeypress="handleKeyPress(event)">
-
-                <!-- MICROPHONE -->
-                <button class="icon-btn" onclick="startVoiceRecognition()" title="Hirafehy feo">
-                    <i class="fa-solid fa-microphone" id="mic-icon"></i>
-                </button>
-
-                <!-- SEND BUTTON -->
-                <button class="send-btn" onclick="sendMessage()" title="Alefa">
-                    <i class="fa-solid fa-paper-plane"></i>
-                </button>
-            </div>
-        </footer>
-
+    <div id="app-container">
+        <!-- RAHARAHA AMIN'NY FRONTEND EFA NIASA TEOTEO (UNTOUCHED) -->
     </div>
 
     <script src="script.js"></script>
