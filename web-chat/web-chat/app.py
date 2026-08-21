@@ -7,22 +7,33 @@ import docx
 
 app = Flask(__name__, static_folder='.')
 
+# SYSTEM PROMPT VAOVAO: Manome rariny sy endrika madio sy kanto tahaka ny Gemini Officiel
 SYSTEM_PROMPT = """
-Ianao dia AI ARISON, mpanampy ara-tsaina manam-pahaizana sy feno haja.
+Ianao dia AI ARISON, mpanampy ara-tsaina manam-pahaizana, tena madio sy matihanina amin'ny fomba fanoratana sy fandaminana ny valinteny.
 
-FITSIPIKA:
-1. Valio amin'ny fiteny ampiasain'ny mpampiasa hatrany ny hafatra (Malagasy, Français, English, etc.).
-2. Mampiasà Markdown kanto:
-   - Ampiasao ny '**' ho an'ny teny manan-danja (mivoaka amin'ny loko Rose Neon).
-   - Ampiasao ny '###' ho an'ny lohateny (mivoaka amin'ny loko Cyan Neon).
-   - Mampiasà emojis mifanaraka tsara.
+FITSIPIKA FANDAMINANA NY VALINTENY (FORMATTING RULES):
+1. Aza mampiasa marika '**' na '#' amin'ny teny rehetra satria manakorontana ny fahadiovan'ny soratra.
+2. Ampiasao ity rafitra manaraka ity isaky ny manazava lohahevitra:
+
+   A) Grand A / B / C... (Lohateny Lehibe):
+      - Asio fitsimbikinana tsipika roa aoriany.
+      - Soraty mazava ny lohateny lehibe.
+
+   1 - Petit 1 / 2 / 3... (Zana-tsoratra):
+      - Mikisaka miankavanana (Indentation).
+      - Asio Emoji mifanaraka tsara amin'ny faran'ilay zana-tsoratra.
+
+   . Fanazavana sy Teboka:
+      - Mikisaka miankavanana mitovy amin'ny Petit 1.
+      - Soratra madio, tsotra, amin'ny loko iray, tsisy marika mikorontana.
+
+3. Valio hatrany amin'ny fiteny ampiasain'ny mpampiasa (Malagasy, Français, English).
 """
 
 api_key = os.environ.get('GEMINI_API_KEY')
 if api_key:
     genai.configure(api_key=api_key)
 
-# Anaran'ny API Models vaovao araka ny torolalana amin'ny sary
 PRIMARY_MODEL = 'gemini-3.6-flash'
 BACKUP_MODEL = 'gemini-3.5-flash-lite'
 
@@ -69,14 +80,12 @@ def chat():
         if not full_prompt.strip():
             return jsonify({'reply': 'Azafady, soraty ny hafatrao na andefaso fichier tompoko!'})
 
-        # 1. Andramana amin'ny gemini-3.6-flash (Primary)
         try:
             model = genai.GenerativeModel(model_name=PRIMARY_MODEL, system_instruction=SYSTEM_PROMPT)
             res = model.generate_content(full_prompt)
             return jsonify({'reply': res.text})
         except Exception as primary_err:
             print(f"[AI ARISON Engine] Primary model {PRIMARY_MODEL} error: {primary_err}. Cascading to backup {BACKUP_MODEL}...")
-            # 2. Raha misy Quota 429 na olana, mifindra an-tsokosoko amin'ny gemini-3.5-flash-lite
             try:
                 backup = genai.GenerativeModel(model_name=BACKUP_MODEL, system_instruction=SYSTEM_PROMPT)
                 res_backup = backup.generate_content(full_prompt)
@@ -87,7 +96,7 @@ def chat():
     except Exception as e:
         err_str = str(e)
         if "429" in err_str or "quota" in err_str.lower():
-            return jsonify({'reply': '⚠️ **Mialana tsiny tompoko**, sahirana kely ny API. Miandrasa kely 5 segondra vao mamerina!'})
+            return jsonify({'reply': '⚠️ Mialana tsiny tompoko, sahirana kely ny API. Miandrasa kely 5 segondra vao mamerina!'})
         return jsonify({'reply': f'Misy olana kely: {err_str}'})
 
 if __name__ == '__main__':

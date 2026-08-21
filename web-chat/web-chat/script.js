@@ -1,206 +1,118 @@
-let conversationHistory = [];
-let selectedFile = null;
+document.addEventListener('DOMContentLoaded', () => {
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const fileInput = document.getElementById('file-input');
+    const micBtn = document.getElementById('mic-btn');
 
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    if (sidebar) sidebar.classList.toggle('active');
-}
+    function formatAiResponse(text) {
+        let lines = text.split('\n');
+        let formatted = '';
 
-function triggerFileInput() {
-    const input = document.getElementById('file-input');
-    if (input) input.click();
-}
-
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        selectedFile = file;
-        const previewArea = document.getElementById('file-preview-area');
-        if (previewArea) {
-            previewArea.innerHTML = `<div style="background: rgba(0, 240, 255, 0.1); border: 1px solid #00f0ff; color: #00f0ff; padding: 5px 12px; border-radius: 15px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                📄 ${file.name} 
-                <span onclick="removeSelectedFile()" style="cursor: pointer; color: #ff2a8d; font-weight: bold; margin-left: 5px;">✕</span>
-            </div>`;
-        }
-    }
-}
-
-function removeSelectedFile() {
-    selectedFile = null;
-    const input = document.getElementById('file-input');
-    if (input) input.value = '';
-    const previewArea = document.getElementById('file-preview-area');
-    if (previewArea) previewArea.innerHTML = '';
-}
-
-function handleKeyPress(event) {
-    if (event.key === 'Enter') {
-        sendMessage();
-    }
-}
-
-function hideWelcomeCard() {
-    const welcomeCard = document.querySelector('.welcome-card');
-    if (welcomeCard) {
-        welcomeCard.style.display = 'none';
-    }
-}
-
-function appendUserMessage(text, fileName = null) {
-    hideWelcomeCard();
-    const container = document.getElementById('chat-container');
-    if (!container) return;
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'message user-message';
-    
-    let content = text;
-    if (fileName) {
-        content = `📁 <em>[Fichier: ${fileName}]</em><br>` + content;
-    }
-    
-    msgDiv.innerHTML = content;
-    container.appendChild(msgDiv);
-    container.scrollTop = container.scrollHeight;
-}
-
-// Parsing Markdown Neon Rose & Cyan
-function parseMarkdownToHTML(text) {
-    let formatted = text;
-
-    formatted = formatted.replace(/^### (.*$)/gim, '<h3 style="color: #00f0ff; font-weight: bold; margin-top: 10px; margin-bottom: 5px;">$1</h3>');
-    formatted = formatted.replace(/^## (.*$)/gim, '<h2 style="color: #00f0ff; font-weight: bold; margin-top: 12px; margin-bottom: 5px;">$1</h2>');
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ff2a8d; font-weight: bold;">$1</strong>');
-    formatted = formatted.replace(/^---$/gim, '<hr style="border: 0; height: 1px; background: #333; margin: 10px 0;">');
-    formatted = formatted.replace(/^\* (.*$)/gim, '<li style="margin-left: 15px;">$1</li>');
-    formatted = formatted.replace(/^- (.*$)/gim, '<li style="margin-left: 15px;">$1</li>');
-    formatted = formatted.replace(/\n/g, '<br>');
-
-    return formatted;
-}
-
-// Indicator 🤔 Mieritreritra
-function showThinkingIndicator() {
-    const container = document.getElementById('chat-container');
-    if (!container) return null;
-
-    const thinkingDiv = document.createElement('div');
-    thinkingDiv.id = 'thinking-indicator';
-    thinkingDiv.className = 'message bot-message';
-    thinkingDiv.style.color = '#00f0ff';
-    thinkingDiv.style.fontSize = '15px';
-    thinkingDiv.style.fontStyle = 'italic';
-    thinkingDiv.innerHTML = '🤔 AI ARISON dia mieritreritra...';
-
-    container.appendChild(thinkingDiv);
-    container.scrollTop = container.scrollHeight;
-    return thinkingDiv;
-}
-
-function removeThinkingIndicator() {
-    const indicator = document.getElementById('thinking-indicator');
-    if (indicator) {
-        indicator.remove();
-    }
-}
-
-// VALINTENY MISESISESY (TYPEWRITER EFFECT)
-function appendBotSubtitleMessage(fullText) {
-    const container = document.getElementById('chat-container');
-    if (!container) return;
-
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'message bot-message';
-    container.appendChild(msgDiv);
-
-    let currentIndex = 0;
-    const speed = 15; // Vitesse amin'ny ms (misesisesy tsara sy haingana)
-
-    function typeNextChar() {
-        if (currentIndex <= fullText.length) {
-            let currentSubString = fullText.substring(0, currentIndex);
-            msgDiv.innerHTML = parseMarkdownToHTML(currentSubString);
-            container.scrollTop = container.scrollHeight;
-            currentIndex++;
-            setTimeout(typeNextChar, speed);
-        }
-    }
-
-    typeNextChar();
-}
-
-async function sendMessage() {
-    const input = document.getElementById('user-input');
-    if (!input) return;
-    const text = input.value.trim();
-    
-    if (!text && !selectedFile) return;
-
-    const fileToSend = selectedFile;
-    const fileName = fileToSend ? fileToSend.name : null;
-
-    appendUserMessage(text, fileName);
-    saveToHistory(text || fileName);
-    
-    input.value = '';
-    removeSelectedFile();
-
-    showThinkingIndicator();
-
-    const formData = new FormData();
-    formData.append('message', text);
-    if (fileToSend) {
-        formData.append('file', fileToSend);
-    }
-
-    try {
-        const response = await fetch('/chat', {
-            method: 'POST',
-            body: formData
+        lines.forEach(line => {
+            let trimmed = line.trim();
+            // Raha Grand A, B, C...
+            if (/^[A-Z]\)/.test(trimmed)) {
+                formatted += `<span class="grand-title">${trimmed}</span>\n`;
+            }
+            // Raha Petit 1, 2, 3...
+            else if (/^\d+\s*-/.test(trimmed)) {
+                formatted += `<span class="petit-title">${trimmed}</span>\n`;
+            }
+            // Raha Teboka na Fanazavana
+            else if (trimmed.startsWith('.') || trimmed.startsWith('-')) {
+                formatted += `<span class="detail-text">${trimmed}</span>\n`;
+            }
+            else if (trimmed.length > 0) {
+                formatted += `<div style="margin-bottom: 6px; color: #d1d5db;">${trimmed}</div>`;
+            }
         });
-        const data = await response.json();
+
+        return formatted || text;
+    }
+
+    function appendMessage(sender, text, isHtml = false) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
         
-        removeThinkingIndicator();
-        appendBotSubtitleMessage(data.reply);
-    } catch (err) {
-        removeThinkingIndicator();
-        appendBotSubtitleMessage("⚠️ Misy olana kely ny fifandraisana tompoko, andramo indray azafady!");
-    }
-}
-
-function startVoiceRecognition() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("Tsy mahazaka Voice Recognition ny browser-nao tompoko.");
-        return;
+        if (isHtml) {
+            msgDiv.innerHTML = text;
+        } else {
+            msgDiv.textContent = text;
+        }
+        
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        const file = fileInput.files[0];
 
-    const micIcon = document.getElementById('mic-icon');
-    if (micIcon) micIcon.style.color = '#ff007f';
+        if (!text && !file) return;
 
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('user-input').value = transcript;
-        if (micIcon) micIcon.style.color = '#8b949e';
-        sendMessage();
-    };
+        let displayMsg = text;
+        if (file) {
+            displayMsg += ` [Fichier: ${file.name}]`;
+        }
 
-    recognition.onerror = () => { if (micIcon) micIcon.style.color = '#8b949e'; };
-    recognition.onend = () => { if (micIcon) micIcon.style.color = '#8b949e'; };
+        appendMessage('user', displayMsg);
+        userInput.value = '';
+        fileInput.value = '';
 
-    recognition.start();
-}
+        const formData = new FormData();
+        formData.append('message', text);
+        if (file) {
+            formData.append('file', file);
+        }
 
-function saveToHistory(text) {
-    conversationHistory.push(text);
-    const list = document.getElementById('history-list');
-    if (list) {
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerText = text;
-        list.prepend(item);
+        const loadingDiv = document.createElement('div');
+        loadingDiv.classList.add('message', 'bot-message');
+        loadingDiv.textContent = 'AI ARISON dia mamakafaka...';
+        chatBox.appendChild(loadingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            chatBox.removeChild(loadingDiv);
+
+            const htmlReply = formatAiResponse(data.reply);
+            appendMessage('bot', htmlReply, true);
+
+        } catch (error) {
+            chatBox.removeChild(loadingDiv);
+            appendMessage('bot', '⚠️ Misy olana kely amin'ny fifandraisana.');
+        }
     }
-}
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // Voice Recognition (Microphone)
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'mg-MG'; // na fr-FR / en-US
+
+        micBtn.addEventListener('click', () => {
+            recognition.start();
+            micBtn.style.color = '#00f0ff';
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            userInput.value = transcript;
+            micBtn.style.color = '';
+        };
+
+        recognition.onerror = () => {
+            micBtn.style.color = '';
+        };
+    }
+});
