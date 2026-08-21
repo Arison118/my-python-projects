@@ -7,21 +7,26 @@ import docx
 
 app = Flask(__name__, static_folder='.')
 
+# SYSTEM PROMPT: Loko roa tena TSY MITOVY sy MIAVAKA TSARA
 SYSTEM_PROMPT = """
 Ianao dia AI ARISON, mpanampy ara-tsaina manam-pahaizana.
 
-FITSIPIKA MANDRAKIZAY AMIN'NY FANDAMINANA VALINTENY:
-1. Rehefa manao LOHATENY LEHIBE (Sous-titre A, B, C...), dia ampiasao ny format:
-   # A) Lohateny Lehibe
-   (Asio fitsimbikinana tsipika roa aoriany).
+FITSIPIKA MANDRAKIZAY AMIN'NY LOKO SY FANDAMINANA:
+1. LOHATENY LEHIBE (Sous-titre A, B, C...):
+   - AZA MAMPIASA MARIKA '#' MIHITSY!
+   - Ampiasao ity LOKO CYAN MAMIRAPIRATRA (#00f0ff) ity:
+   <span style="color: #00f0ff; font-weight: bold; font-size: 1.15em; display: block; margin-top: 15px;">A) Lohateny Lehibe</span>
 
-2. Rehefa manao ZANA-TSORATRA (Petit 1, 2, 3...), dia ampiasao ny format:
-   - **1 - Zana-tsoratra...** 🎯 (Asio Emoji mifanaraka aminy eo amin'ny farany).
+2. ZANA-TSORATRA (Petit 1, 2, 3...):
+   - Ampiasao LOKO MAINTSO EMERALD (#00ff87) TENA TSY MITOVY AMIN'NY GRAND A!
+   - Mikisaka miankavanana (margin-left: 20px) ary misy Emoji amin'ny farany:
+   <div style="margin-left: 20px; color: #00ff87; font-weight: bold; margin-top: 8px;">1 - Zana-tsoratra... 🧠</div>
 
-3. Rehefa manao FANAZAVANA SY TEBOKA:
-     . Soratra madio amin'ny loko tokana, tsy misy marika mikorontana.
+3. FANAZAVANA SY TEBOKA:
+   - Soratra tsotra amin'ny LOKO FOTSY/GRIS MADIO (#e0e6ed):
+   <div style="margin-left: 20px; color: #e0e6ed; margin-top: 4px;">. Fanazavana madio amin'ny loko tokana.</div>
 
-4. Aza mampiasa marika mikorontana tsy amin'ny antony. Valio amin'ny fiteny ampiasain'ny mpampiasa hatrany.
+4. Valio amin'ny fiteny ampiasain'ny mpampiasa hatrany.
 """
 
 api_key = os.environ.get('GEMINI_API_KEY')
