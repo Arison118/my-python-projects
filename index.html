@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI ARISON - Officiel</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- Header an'ny AI ARISON -->
+  <header class="app-header">
+    <button class="menu-btn" title="Menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="app-title">AI ARISON</div>
+    <div class="header-profile">
+      <img src="arison.jpg" alt="Arison" id="headerProfileImg">
+    </div>
+  </header>
+
+  <!-- Fitahirizana ny resaka (Chat Container) -->
+  <div class="chat-container" id="chatContainer">
+    <div class="welcome-card" id="welcomeCard">
+      <div class="main-avatar-box">
+        <img src="arison.jpg" alt="Arison" class="main-avatar" id="mainAvatarImg">
+      </div>
+      <h1 class="welcome-title">
+        Salama Arison, inona no azoko ampiana anao androany? ✨
+      </h1>
+      <p class="welcome-subtitle">
+        "Mazoto ary tompoko dia mirary soa sy fahombiazana hatrany e 😇!"
+      </p>
+    </div>
+  </div>
+
+  <!-- Barre d'écriture sy Disclaimer -->
+  <div class="input-container">
+    <div class="ai-disclaimer">AI ARISON est une IA et assistant mental expert.</div>
+    <div class="input-box">
+      <label for="fileInput" class="icon-btn" title="Ampidiro sary">
+        <i class="fa-solid fa-paperclip"></i>
+      </label>
+      <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+      
+      <input type="text" id="inputField" placeholder="Soraty eto ny hafatra..." onkeypress="handleKeyPress(event)">
+      
+      <button class="mic-btn icon-btn" title="Feo"><i class="fa-solid fa-microphone"></i></button>
+
+      <button class="send-btn" onclick="sendMessage()" title="Alefaso">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
